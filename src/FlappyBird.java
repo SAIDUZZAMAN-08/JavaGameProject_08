@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class FlappyBird extends JPanel {
+public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
     int boardWidth = 360;
     int boardHeight = 640;
@@ -13,10 +13,14 @@ public class FlappyBird extends JPanel {
     Image backgroundImg, birdImg, topPipeImg, bottomPipeImg;
 
     Bird bird;
+    Timer gameLoop;
+
+    int velocityY = 0, gravity = 1;
 
     public FlappyBird() {
         setPreferredSize(new Dimension(boardWidth, boardHeight));
         setFocusable(true);
+        addKeyListener(this);
 
 
         // Load Images
@@ -24,9 +28,10 @@ public class FlappyBird extends JPanel {
         birdImg = new ImageIcon(getClass().getResource("./flappybird.png")).getImage();
         topPipeImg = new ImageIcon(getClass().getResource("./toppipe.png")).getImage();
         bottomPipeImg = new ImageIcon(getClass().getResource("./bottompipe.png")).getImage();
-
         bird = new Bird(boardWidth / 8, boardWidth / 2, 34, 24, birdImg);
 
+        gameLoop = new Timer(1000 / 60, this);
+        gameLoop.start();
     }
 
     public void paintComponent(Graphics g) {
@@ -34,6 +39,26 @@ public class FlappyBird extends JPanel {
         g.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight, null);
         g.drawImage(bird.img, bird.x, bird.y, bird.width, bird.height, null);
     }
+
+    public void move() {
+        velocityY += gravity;
+        bird.y += velocityY;
+        bird.y = Math.max(bird.y, 0);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        move();
+        repaint();
+    }
+
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            velocityY = -9;
+        }
+    }
+
+    public void keyTyped(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {}
 
 
     public static void main(String[] args) {

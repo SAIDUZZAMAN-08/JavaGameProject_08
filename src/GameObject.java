@@ -12,8 +12,8 @@ public class GameObject {
         this.img = img;
     }
 
-    public void draw(Graphics g) {
-        g.drawImage(img, x, y, width, height, null);
-    }
+//    public void draw(Graphics g) {
+//        g.drawImage(img, x, y, width, height, null);
+//    }
 }
 

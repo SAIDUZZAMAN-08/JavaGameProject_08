@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
-    int boardWidth = 360;
+    int boardWidth = 600;
     int boardHeight = 640;
 
     // Images
@@ -18,6 +18,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     int pipeX = boardWidth, pipeWidth = 64, pipeHeight = 512;
 
     ArrayList<Pipe> pipes = new ArrayList<>();
+    ArrayList<GameObject> gameObjects = new ArrayList<>();
     Random random = new Random();
 
     int velocityX = -4,velocityY = 0, gravity = 1;
@@ -25,6 +26,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     Timer gameLoop,placePipeTimer;
     boolean gameOver = false;
     double score = 0;
+    double highScore = 0;
 
 
     public FlappyBird() {
@@ -39,6 +41,8 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         topPipeImg = new ImageIcon(getClass().getResource("./toppipe.png")).getImage();
         bottomPipeImg = new ImageIcon(getClass().getResource("./bottompipe.png")).getImage();
         bird = new Bird(boardWidth / 8, boardWidth / 2, 34, 24, birdImg);
+
+        gameObjects.add(bird); //For polymorphism
 
         placePipeTimer = new Timer(1500, e -> placePipes());
         placePipeTimer.start();
@@ -56,26 +60,34 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
         pipes.add(topPipe);
         pipes.add(bottomPipe);
+
+        gameObjects.add(topPipe); //Polymorphism
+        gameObjects.add(bottomPipe);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         draw(g);
-//        g.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight, null);
-//        g.drawImage(bird.img, bird.x, bird.y, bird.width, bird.height, null);
     }
 
     public void draw(Graphics g) {
         g.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight, null);
-        g.drawImage(bird.img, bird.x, bird.y, bird.width, bird.height, null);
 
-        for (Pipe pipe : pipes) {
-            g.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height, null);
+//        g.drawImage(bird.img, bird.x, bird.y, bird.width, bird.height, null);
+//        for (Pipe pipe : pipes) {
+//            g.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height, null);
+//        }
+
+        for (GameObject obj : gameObjects) {
+            obj.draw(g);  // Polymorphic call
         }
 
-        g.setColor(Color.white);
+        g.setColor(Color.black);
         g.setFont(new Font("Arial", Font.PLAIN, 32));
-        g.drawString(gameOver ? "Game Over: " + (int) score : String.valueOf((int) score), 10, 35);
+        g.drawString(gameOver ? "Game Over: " + (int) score : "Score: " + String.valueOf((int) score), 10, 35);
+
+        //High score
+        g.drawString("HS: " + (int) highScore, 10, 70);
     }
 
     public void move() {
@@ -110,6 +122,11 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         repaint();
 
         if (gameOver) {
+
+          if (score > highScore) {
+              highScore = score;
+            }
+
             placePipeTimer.stop();
             gameLoop.stop();
         }
@@ -123,7 +140,12 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
                 bird.y = boardWidth / 2;
                 velocityY = 0;
                 pipes.clear();
+
+                gameObjects.clear();
+                gameObjects.add(bird);  // Polymorphism
+
                 gameOver = false;
+
                 score = 0;
                 gameLoop.start();
                 placePipeTimer.start();

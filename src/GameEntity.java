@@ -1,0 +1,3 @@
+interface GameEntity {
+    void move();
+}
